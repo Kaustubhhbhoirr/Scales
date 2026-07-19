@@ -255,6 +255,12 @@
     opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 200;
   }
   .toast.show { opacity: 1; }
+  .toast-action {
+    margin-left: 14px; background: none; border: 1px solid rgba(245,241,234,.35);
+    color: var(--paper); border-radius: 2px; padding: 5px 11px; cursor: pointer;
+    font-size: 10px; letter-spacing: .13em; text-transform: uppercase; transition: .15s;
+  }
+  .toast-action:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
 </style>
 </head>
 <body>

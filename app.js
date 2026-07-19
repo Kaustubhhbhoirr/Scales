@@ -100,18 +100,60 @@ function updateStatus() {
 // Re-render helper used by the interactive code edits (shape swap, arrow color).
 function reRender() { renderDiagram(codeInput.value, true); }
 
+// ---- Auto-save ----
+// Kept in localStorage so an accidental refresh doesn't destroy someone's work.
+// This is local to the browser only — nothing is ever transmitted anywhere.
+// Every access is guarded: localStorage throws in private mode and when the
+// quota is exceeded, and losing auto-save must never break the editor.
+const STORAGE_KEY = 'scales.diagram';
+
+function saveCode() {
+  try { localStorage.setItem(STORAGE_KEY, codeInput.value); } catch (e) { /* not fatal */ }
+}
+function loadSavedCode() {
+  try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
+}
+function clearSavedCode() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* not fatal */ }
+}
+
+// Writing on every keystroke is wasteful; a short debounce is plenty to
+// survive a refresh.
+let saveTimer;
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveCode, 300);
+}
+
 // Live: render on every keystroke, keeping the user's zoom/pan.
 codeInput.addEventListener('input', () => {
   updateGutter();
+  scheduleSave();
   renderDiagram(codeInput.value, true);
 });
 
+// A pending debounce would be lost if the tab closes first.
+window.addEventListener('beforeunload', saveCode);
+
+// Clearing is destructive, so it is offered back as an undo rather than
+// guarded behind a confirm dialog.
 document.getElementById('new-diagram').addEventListener('click', () => {
+  const previous = codeInput.value;
   codeInput.value = '';
   updateGutter();
+  saveCode();
   renderDiagram('');
   updateStatus();
   codeInput.focus();
+
+  if (previous.trim()) {
+    Interactions.toast('Diagram cleared', 'Undo', () => {
+      codeInput.value = previous;
+      updateGutter();
+      saveCode();
+      renderDiagram(previous);
+    });
+  }
 });
 
 document.getElementById('copy-code').addEventListener('click', async () => {
@@ -289,6 +331,11 @@ window.addEventListener('resize', () => PanZoom.fit());
 Interactions.init({ codeInput, onCodeChange: reRender });
 PanZoom.init();
 syncFormatUI();
-updateGutter();
 
+// Restore the last session's work. An empty saved value is ignored so a
+// cleared editor doesn't override the starter diagram on a fresh visit.
+const restored = loadSavedCode();
+if (restored && restored.trim()) codeInput.value = restored;
+
+updateGutter();
 renderDiagram(codeInput.value);

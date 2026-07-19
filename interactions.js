@@ -222,13 +222,28 @@ const Interactions = (() => {
   }
 
   // ---- toast ----
+  // An optional action turns the toast into an undo prompt, which needs
+  // pointer events and a longer dwell so it can actually be clicked.
   let toastTimer;
-  function toast(msg) {
+  function toast(msg, actionLabel, onAction) {
     const el = document.getElementById('toast');
-    el.textContent = msg;
+    el.textContent = '';
+    el.append(msg);
+    const interactive = Boolean(actionLabel && onAction);
+    if (interactive) {
+      const b = document.createElement('button');
+      b.className = 'toast-action';
+      b.textContent = actionLabel;
+      b.addEventListener('click', () => {
+        onAction();
+        el.classList.remove('show');
+      });
+      el.append(b);
+    }
+    el.style.pointerEvents = interactive ? 'auto' : 'none';
     el.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+    toastTimer = setTimeout(() => el.classList.remove('show'), interactive ? 7000 : 2600);
   }
 
   return { init, attach, toast };

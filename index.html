@@ -3,8 +3,44 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Scales — Mermaid to PNG</title>
+<title>Mermaid to PNG &amp; SVG Converter — Free, No Signup | Scales</title>
+<meta name="description" content="Paste Mermaid diagram code and instantly download a high-resolution PNG or SVG. Free, no signup, no upload — everything runs in your browser. Supports flowchart, sequence, class, ER, gantt and more.">
+<link rel="canonical" href="https://scales-ruddy.vercel.app/">
+<meta name="theme-color" content="#E4DED2">
 <link rel="icon" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+
+<!-- Open Graph / social preview -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://scales-ruddy.vercel.app/">
+<meta property="og:title" content="Scales — Mermaid to PNG &amp; SVG, instantly">
+<meta property="og:description" content="Paste Mermaid code, get a high-res PNG or SVG. No signup, no upload, no rate limits — it all runs in your browser.">
+<meta property="og:image" content="https://scales-ruddy.vercel.app/logo.png">
+<meta property="og:image:alt" content="Scales — a Mermaid diagram editor with live preview and image export">
+<meta property="og:site_name" content="Scales">
+
+<!-- "summary" suits the square logo; switch to summary_large_image once a
+     1200x630 preview.png exists. -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Scales — Mermaid to PNG &amp; SVG, instantly">
+<meta name="twitter:description" content="Paste Mermaid code, get a high-res PNG or SVG. No signup, no upload — 100% in your browser.">
+<meta name="twitter:image" content="https://scales-ruddy.vercel.app/logo.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Scales",
+  "url": "https://scales-ruddy.vercel.app/",
+  "description": "Convert Mermaid diagram code into high-resolution PNG or SVG images. Free, no signup, runs entirely in the browser.",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "browserRequirements": "Requires JavaScript",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Person", "name": "Kaustubh Bhoir" },
+  "license": "https://opensource.org/licenses/MIT"
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -40,7 +76,7 @@
     display: flex; align-items: center; gap: 18px;
     padding: 12px 22px; border-bottom: 1px solid var(--line); background: var(--surface);
   }
-  .wordmark { font-family: var(--serif); font-size: 30px; line-height: 1; letter-spacing: .01em; }
+  .wordmark { font-family: var(--serif); font-size: 30px; line-height: 1; letter-spacing: .01em; margin: 0; font-weight: 400; }
   /* The logo art sits in a lot of its own padding, so it is scaled up inside
      a clipped badge to make the shell fill the mark. */
   .logo-badge {
@@ -223,7 +259,7 @@
 <body>
   <header>
     <div class="logo-badge"><img src="logo.png" alt="Scales logo"></div>
-    <div class="wordmark">Scales</div>
+    <h1 class="wordmark">Scales</h1>
     <div class="spacer"></div>
     <div class="stamp">Privacy first • Free forever</div>
   </header>
@@ -306,6 +342,19 @@
     <span id="node-count"></span>
     <span><span class="dot"></span>Rendering engine online</span>
   </footer>
+
+  <noscript>
+    <div style="padding:28px;max-width:640px;font-family:system-ui,sans-serif;line-height:1.6">
+      <h2>Scales — Mermaid to PNG &amp; SVG converter</h2>
+      <p>Scales converts Mermaid diagram code into high-resolution PNG or SVG images.
+         Paste your code, preview it live, and download it — free, with no signup and
+         no upload, because everything runs locally in your browser.</p>
+      <p>Supported diagram types: flowchart, sequence, class, entity relationship (ER),
+         state, gantt, pie, git graph and user journey.</p>
+      <p><strong>This tool needs JavaScript enabled to render diagrams.</strong></p>
+      <p><a href="https://github.com/Kaustubhhbhoirr/Scales">Source code on GitHub</a></p>
+    </div>
+  </noscript>
 
   <div id="ctx-popup"></div>
   <div id="toast" class="toast"></div>

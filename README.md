@@ -59,8 +59,8 @@ Plus a light visual editing layer: **click a node to change its shape** without 
 There is no install step. There is no build step.
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/scales
-cd scales
+git clone https://github.com/Kaustubhhbhoirr/Scales.git
+cd Scales
 ```
 
 Then **open `index.html` in your browser.** Double-click it. That's the whole setup.
@@ -150,7 +150,7 @@ Fixed with `htmlLabels: false`, which makes labels native SVG `<text>`. A 12px e
 ## 📂 Project Structure
 
 ```
-scales/
+Scales/
 ├── index.html         # layout, theme, all styling
 ├── app.js             # render loop, export pipeline, UI wiring
 ├── interactions.js    # click-to-edit, shape swapping, code rewrites

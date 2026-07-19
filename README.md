@@ -25,7 +25,20 @@
 
 *No framework · No bundler · No server · One HTML file and three scripts*
 
+[![Live Demo](https://img.shields.io/badge/▶_Try_it_live-C4552D?style=for-the-badge&logoColor=white)](https://scales-ruddy.vercel.app/)
+
 </div>
+
+---
+
+## 🚀 Live
+
+| | |
+|---|---|
+| 🌐 **App** | [scales-ruddy.vercel.app](https://scales-ruddy.vercel.app/) |
+| 📦 **Source** | [github.com/Kaustubhhbhoirr/Scales](https://github.com/Kaustubhhbhoirr/Scales) |
+
+No account. No upload. Paste and export.
 
 ---
 
@@ -54,7 +67,7 @@ Plus a light visual editing layer: **click a node to change its shape** without 
 
 ---
 
-## 🚀 Quick Start
+## 🛠️ Run It Yourself
 
 There is no install step. There is no build step.
 

@@ -10,15 +10,17 @@ mermaid.initialize({
   htmlLabels: false,
   flowchart: { htmlLabels: false, useMaxWidth: false },
   theme: 'base',
+  // Diagram ink stays dark regardless of the UI theme — the canvas represents
+  // the exported image, which is white or transparent.
   themeVariables: {
     background: '#FFFFFF',
-    primaryColor: '#FBF9F5',
-    primaryTextColor: '#1A1A1A',
-    primaryBorderColor: '#C4552D',
-    secondaryColor: '#F5F1EA',
-    tertiaryColor: '#F1ECE4',
-    lineColor: '#8A8177',
-    textColor: '#1A1A1A',
+    primaryColor: '#FFFFFF',
+    primaryTextColor: '#0D273D',
+    primaryBorderColor: '#3E6985',
+    secondaryColor: '#E7ECF0',
+    tertiaryColor: '#CDD7DF',
+    lineColor: '#3E6985',
+    textColor: '#0D273D',
     fontFamily: 'Inter, system-ui, sans-serif',
     fontSize: '14px'
   }

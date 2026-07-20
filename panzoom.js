@@ -17,6 +17,10 @@ const PanZoom = (() => {
   const MIN = 0.1, MAX = 10;
 
   let dragging = false, moved = false, startX = 0, startY = 0, startTx = 0, startTy = 0;
+  // Active pointers, so touch drags and two-finger pinch work the same way
+  // mouse drags do. Pointer Events cover mouse, touch and pen in one path.
+  const pointers = new Map();
+  let pinchStartDist = 0, pinchStartScale = 1;
 
   function apply() {
     const svg = svgEl();
@@ -82,14 +86,47 @@ const PanZoom = (() => {
       zoomAt(e.clientX, e.clientY, e.deltaY < 0 ? 1.12 : 1 / 1.12);
     }, { passive: false });
 
-    c.addEventListener('mousedown', (e) => {
-      if (e.button !== 0) return;
+    c.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+      if (pointers.size === 2) {
+        // second finger down: start a pinch, stop panning
+        const [a, b] = [...pointers.values()];
+        pinchStartDist = Math.hypot(a.x - b.x, a.y - b.y);
+        pinchStartScale = scale;
+        dragging = false;
+        c.classList.remove('panning');
+        return;
+      }
+
       dragging = true; moved = false;
       startX = e.clientX; startY = e.clientY; startTx = tx; startTy = ty;
       c.classList.add('panning');
+      if (c.setPointerCapture) { try { c.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ } }
     });
 
-    window.addEventListener('mousemove', (e) => {
+    c.addEventListener('pointermove', (e) => {
+      if (!pointers.has(e.pointerId)) return;
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+      if (pointers.size === 2 && pinchStartDist > 0) {
+        const [a, b] = [...pointers.values()];
+        const dist = Math.hypot(a.x - b.x, a.y - b.y);
+        if (!dist) return;
+        const target = Math.min(MAX, Math.max(MIN, pinchStartScale * (dist / pinchStartDist)));
+        // zoom about the midpoint between the fingers
+        const rect = container().getBoundingClientRect();
+        const px = (a.x + b.x) / 2 - rect.left, py = (a.y + b.y) / 2 - rect.top;
+        const ratio = target / scale;
+        tx = px - (px - tx) * ratio;
+        ty = py - (py - ty) * ratio;
+        scale = target;
+        moved = true;
+        apply();
+        return;
+      }
+
       if (!dragging) return;
       const dx = e.clientX - startX, dy = e.clientY - startY;
       if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
@@ -97,10 +134,17 @@ const PanZoom = (() => {
       apply();
     });
 
-    window.addEventListener('mouseup', () => {
-      dragging = false;
-      c.classList.remove('panning');
-    });
+    const endPointer = (e) => {
+      pointers.delete(e.pointerId);
+      if (pointers.size < 2) pinchStartDist = 0;
+      if (pointers.size === 0) {
+        dragging = false;
+        c.classList.remove('panning');
+      }
+    };
+    c.addEventListener('pointerup', endPointer);
+    c.addEventListener('pointercancel', endPointer);
+    c.addEventListener('pointerleave', (e) => { if (e.pointerType !== 'mouse') endPointer(e); });
 
     document.getElementById('zoom-in').addEventListener('click', () => zoomButton(1.25));
     document.getElementById('zoom-out').addEventListener('click', () => zoomButton(1 / 1.25));

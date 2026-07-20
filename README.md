@@ -15,17 +15,17 @@
 
 **Paste Mermaid code. Get a high-res image. That's it.**
 
-[![Version](https://img.shields.io/badge/version-1.0-C4552D?style=flat-square)](#)
-[![License](https://img.shields.io/badge/license-MIT-232019?style=flat-square)](LICENSE)
-[![Cost](https://img.shields.io/badge/cost-%240-C4552D?style=flat-square)](#)
-[![Backend](https://img.shields.io/badge/backend-none-232019?style=flat-square)](#)
-[![Signup](https://img.shields.io/badge/signup-never-C4552D?style=flat-square)](#)
+[![Version](https://img.shields.io/badge/version-1.0-3E6985?style=flat-square)](#)
+[![License](https://img.shields.io/badge/license-MIT-0D273D?style=flat-square)](LICENSE)
+[![Cost](https://img.shields.io/badge/cost-%240-3E6985?style=flat-square)](#)
+[![Backend](https://img.shields.io/badge/backend-none-0D273D?style=flat-square)](#)
+[![Signup](https://img.shields.io/badge/signup-never-3E6985?style=flat-square)](#)
 [![Mermaid](https://img.shields.io/badge/Mermaid-v10-FF3670?style=flat-square)](https://mermaid.js.org)
-[![Dependencies](https://img.shields.io/badge/build%20step-none-232019?style=flat-square)](#)
+[![Dependencies](https://img.shields.io/badge/build%20step-none-0D273D?style=flat-square)](#)
 
 *No framework · No bundler · No server · One HTML file and three scripts*
 
-[![Live Demo](https://img.shields.io/badge/▶_Try_it_live-C4552D?style=for-the-badge&logoColor=white)](https://scales-ruddy.vercel.app/)
+[![Live Demo](https://img.shields.io/badge/▶_Try_it_live-3E6985?style=for-the-badge&logoColor=white)](https://scales-ruddy.vercel.app/)
 
 </div>
 
@@ -99,6 +99,9 @@ Want it online? Drop the folder on GitHub Pages, Netlify, Vercel, or any static 
 | **Arrow colours** | Click an edge → pick a colour → `linkStyle` is inserted for you |
 | **Jump to code** | Click any element in any diagram type → its line is highlighted in the editor |
 | **Honest errors** | Syntax errors show inline; your last good diagram stays on screen |
+| **Auto-save** | Work is kept in `localStorage` — a refresh or crash won't lose it |
+| **Undo** | Clearing the editor offers an Undo instead of wiping silently |
+| **Works on mobile** | Layout stacks on phones; drag to pan, pinch to zoom |
 
 ---
 
@@ -181,17 +184,19 @@ Four files. No `node_modules`. No config.
 
 ## 🎨 Design
 
-Warm editorial rather than the usual dark developer dashboard — bone paper, ink black, a single clay accent.
+Editorial rather than the usual dark developer dashboard — soft blues, deep navy ink, and a single teal accent.
 
-| Token | Value |
-|---|---|
-| Paper | `#E4DED2` |
-| Surface | `#EFEAE0` |
-| Ink | `#232019` |
-| Accent (clay) | `#9E4B31` |
-| Hairline | `#D2C9B9` |
+| Token | Value | |
+|---|---|---|
+| Paper | `#CDD7DF` | Columbia Blue |
+| Surface | `#E7ECF0` | panels |
+| Ink | `#0D273D` | Yankees Blue |
+| Accent | `#3E6985` | Teal Blue |
+| Hairline | `#A6BED1` | Pastel Blue |
 
-Type is **Instrument Serif** for the wordmark, **Inter** for UI, **JetBrains Mono** for code. Mermaid itself is re-themed to match, so diagrams render in paper-and-clay instead of the stock lavender.
+Type is **Instrument Serif** for the wordmark, **Inter** for UI, **JetBrains Mono** for code.
+
+Mermaid is re-themed to match, replacing its stock lavender. One deliberate exception: **diagram ink stays dark navy regardless of the interface colours**, because the canvas stands in for the exported image — which is white or transparent. Tinting diagram text to match a dark UI makes it invisible in the PNG.
 
 ---
 
@@ -207,12 +212,15 @@ Type is **Instrument Serif** for the wordmark, **Inter** for UI, **JetBrains Mon
 - [x] Click-to-change node shapes (flowchart)
 - [x] Arrow colouring (flowchart)
 - [x] Jump-to-code (all diagram types)
+- [x] Auto-save — a refresh no longer loses your work
+- [x] Undo on clearing the editor
+- [x] Mobile layout with touch pan and pinch zoom
 
 ### V1.1 — Quality of life
-- [ ] Auto-save to `localStorage` so refresh doesn't lose work
 - [ ] Diagram history — recent diagrams in the sidebar
 - [ ] Theme picker — switch Mermaid colour themes
 - [ ] Keyboard shortcuts (`Ctrl+S` export, `Ctrl+0` fit)
+- [ ] Self-host Mermaid and fonts so the app works fully offline
 
 ### V2 — Deeper editing
 - [ ] Drag nodes to reposition
@@ -226,7 +234,8 @@ Type is **Instrument Serif** for the wordmark, **Inter** for UI, **JetBrains Mon
 
 - **Shape editing is flowchart-only.** Node shapes are a flowchart concept in Mermaid — sequence, class and ER diagrams have no interchangeable shapes. Those diagrams still get click-to-highlight and jump-to-code.
 - **Code rewriting is text-based.** It targets the common single-line node definition that AI tools produce. If a node can't be located unambiguously, it tells you instead of corrupting your code.
-- **Needs a connection on first load** for the Mermaid CDN and fonts.
+- **Needs a connection on first load** for the Mermaid CDN and fonts. No diagram data is sent — these are plain asset downloads — but those two CDNs do see that a visitor loaded the page. Self-hosting them is on the roadmap.
+- **Auto-save is per-browser.** Work is kept in `localStorage`, so it never leaves your machine, but it also doesn't follow you to another device — and on a shared computer the last diagram is still there for the next person.
 
 ---
 

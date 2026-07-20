@@ -285,15 +285,17 @@
     /* editor and canvas share the remaining height */
     #source-panel { flex: 0 0 38%; width: 100%; border-right: 0; border-bottom: 1px solid var(--line); }
     #canvas-pane { flex: 1; min-height: 0; }
-    #preview { margin: 10px 10px 62px; }
+    #preview { margin: 10px 10px 104px; }  /* clears the two-row export bar */
 
-    /* controls sit inline so they can't cover the diagram */
-    .export-bar {
-      right: 10px; left: 10px; bottom: 8px; overflow-x: auto;
-      justify-content: flex-start; scrollbar-width: thin;
+    /* Controls wrap onto two rows rather than scrolling sideways — the
+       primary Download action must never be parked off-screen. */
+    .export-bar { right: 10px; left: 10px; bottom: 8px; flex-wrap: wrap; }
+    .export-bar .seg { padding: 0 10px; flex: 1 1 auto; justify-content: center; }
+    .export-bar .seg:nth-child(3) { border-right: 0; }
+    .export-bar .seg:last-child {
+      flex: 1 0 100%; border-top: 1px solid var(--line); padding: 0;
     }
-    .export-bar .seg { padding: 0 12px; flex: none; }
-    .export-bar .act { padding: 12px 14px; white-space: nowrap; }
+    .export-bar .act { flex: 1; padding: 13px 10px; white-space: nowrap; text-align: center; }
     .zoom-rail { top: 18px; right: 18px; flex-direction: row; }
     #zoom-indicator { border: 0; border-left: 1px solid var(--line); border-right: 1px solid var(--line); padding: 0 8px; display: grid; place-items: center; }
 

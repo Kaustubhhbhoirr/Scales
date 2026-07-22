@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="logo.png" width="120" alt="Scales logo" />
+<img src="logo2.png" width="120" alt="Scales logo" />
 
 <br><br>
 
@@ -171,7 +171,7 @@ Scales/
 ├── app.js             # render loop, export pipeline, UI wiring
 ├── interactions.js    # click-to-edit, shape swapping, code rewrites
 ├── panzoom.js         # zoom + pan (vector-accurate)
-├── logo.png
+├── logo2.png
 └── docs/
     └── superpowers/
         ├── specs/     # design documents

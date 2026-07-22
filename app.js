@@ -157,11 +157,121 @@ function clearSavedCode() {
 }
 
 // Writing on every keystroke is wasteful; a short debounce is plenty to
-// survive a refresh.
+// survive a refresh. The same debounce upserts the diagram into history.
 let saveTimer;
 function scheduleSave() {
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveCode, 300);
+  saveTimer = setTimeout(() => { saveCode(); snapshotToHistory(); }, 300);
+}
+
+// ---- Diagram history ----
+// A short list of recent diagrams, in localStorage (never transmitted). Each
+// diagram the user works on is ONE entry, identified by currentEntryId and
+// updated live as they type — so history holds distinct diagrams, not one row
+// per keystroke. "New Diagram" starts a fresh entry; the old one stays.
+const HISTORY_KEY = 'scales.history';
+const HISTORY_MAX = 12;
+let currentEntryId = null;
+
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch (e) { return []; }
+}
+function persistHistory(list) {
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch (e) { /* not fatal */ }
+}
+function newEntryId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+function snapshotToHistory() {
+  const code = codeInput.value;
+  if (!code.trim()) return;
+  if (!currentEntryId) currentEntryId = newEntryId();
+  let list = loadHistory()
+    .filter((e) => e.id !== currentEntryId && e.code !== code); // drop old self + exact twins
+  list.unshift({ id: currentEntryId, code, ts: Date.now() });
+  if (list.length > HISTORY_MAX) list = list.slice(0, HISTORY_MAX);
+  persistHistory(list);
+  renderHistory();
+}
+
+function loadHistoryEntry(id) {
+  const entry = loadHistory().find((e) => e.id === id);
+  if (!entry) return;
+  if (currentEntryId) snapshotToHistory(); // keep the outgoing diagram
+  currentEntryId = entry.id;                // continue editing this one
+  codeInput.value = entry.code;
+  updateGutter();
+  saveCode();
+  renderDiagram(entry.code);
+  renderHistory();
+}
+
+function deleteHistoryEntry(id) {
+  persistHistory(loadHistory().filter((e) => e.id !== id));
+  if (id === currentEntryId) currentEntryId = null;
+  renderHistory();
+}
+
+function relativeTime(ts) {
+  const s = Math.max(0, (Date.now() - ts) / 1000);
+  if (s < 45) return 'just now';
+  if (s < 3600) return Math.round(s / 60) + 'm';
+  if (s < 86400) return Math.round(s / 3600) + 'h';
+  return Math.round(s / 86400) + 'd';
+}
+
+function firstLine(code) {
+  const line = code.split('\n').map((l) => l.trim()).find((l) => l) || 'Untitled';
+  return line.length > 30 ? line.slice(0, 29) + '…' : line;
+}
+
+const historyList = document.getElementById('history-list');
+
+function renderHistory() {
+  if (!historyList) return;
+  const list = loadHistory();
+  historyList.innerHTML = '';
+  if (!list.length) {
+    const empty = document.createElement('div');
+    empty.className = 'hist-empty';
+    empty.textContent = 'No recent diagrams yet';
+    historyList.appendChild(empty);
+    return;
+  }
+  for (const e of list) {
+    const item = document.createElement('div');
+    item.className = 'hist-item' + (e.id === currentEntryId ? ' active' : '');
+    item.title = 'Open this diagram';
+
+    const open = document.createElement('button');
+    open.className = 'hist-open';
+    open.innerHTML =
+      `<span class="hist-title"></span><span class="hist-time"></span>`;
+    open.querySelector('.hist-title').textContent = firstLine(e.code);
+    open.querySelector('.hist-time').textContent = relativeTime(e.ts);
+    open.addEventListener('click', () => loadHistoryEntry(e.id));
+
+    const del = document.createElement('button');
+    del.className = 'hist-del';
+    del.title = 'Remove from history';
+    del.textContent = '×';
+    del.addEventListener('click', (ev) => { ev.stopPropagation(); deleteHistoryEntry(e.id); });
+
+    item.appendChild(open);
+    item.appendChild(del);
+    historyList.appendChild(item);
+  }
+}
+
+const clearHistoryBtn = document.getElementById('clear-history');
+if (clearHistoryBtn) {
+  clearHistoryBtn.addEventListener('click', () => {
+    persistHistory([]);
+    currentEntryId = null;
+    renderHistory();
+    Interactions.toast('History cleared');
+  });
 }
 
 // Live: render on every keystroke, keeping the user's zoom/pan.
@@ -178,6 +288,9 @@ window.addEventListener('beforeunload', saveCode);
 // guarded behind a confirm dialog.
 document.getElementById('new-diagram').addEventListener('click', () => {
   const previous = codeInput.value;
+  const previousId = currentEntryId;
+  if (previous.trim()) snapshotToHistory(); // finalise the outgoing diagram
+  currentEntryId = null;                    // next edits start a fresh entry
   codeInput.value = '';
   updateGutter();
   saveCode();
@@ -187,6 +300,7 @@ document.getElementById('new-diagram').addEventListener('click', () => {
 
   if (previous.trim()) {
     Interactions.toast('Diagram cleared', 'Undo', () => {
+      currentEntryId = previousId;
       codeInput.value = previous;
       updateGutter();
       saveCode();
@@ -422,5 +536,11 @@ applyTheme(savedTheme, { rerender: false });
 const restored = loadSavedCode();
 if (restored && restored.trim()) codeInput.value = restored;
 
+// If the restored diagram matches the newest history entry, keep editing that
+// entry instead of spawning a duplicate on the next keystroke.
+const topHistory = loadHistory()[0];
+if (restored && topHistory && topHistory.code === restored) currentEntryId = topHistory.id;
+
+renderHistory();
 updateGutter();
 renderDiagram(codeInput.value);

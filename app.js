@@ -306,10 +306,13 @@ async function copyToClipboard() {
   }
 }
 
+const MOD = /Mac|iPhone|iPad/.test(navigator.platform) ? '⌘' : 'Ctrl';
+
 // Keep the toolbar honest about which options apply to the chosen format.
 function syncFormatUI() {
   const isSvg = formatSelect.value === 'svg';
   downloadBtn.textContent = isSvg ? 'Download SVG' : 'Download PNG';
+  downloadBtn.title = `Download ${isSvg ? 'SVG' : 'PNG'}  (${MOD}+S)`;
   scaleLabel.classList.toggle('disabled', isSvg);
   scaleLabel.title = isSvg ? 'Scale applies to PNG only — SVG is vector' : '';
 }
@@ -326,6 +329,28 @@ downloadBtn.addEventListener('click', () => {
   });
 });
 copyBtn.addEventListener('click', () => copyToClipboard());
+
+// ---- Keyboard shortcuts ----
+// Only Ctrl/Cmd combos are used, so they fire reliably even while the code
+// editor (a textarea) has focus, and don't clash with normal typing.
+//   Ctrl/Cmd + S  →  download in the current format (overrides browser Save)
+//   Ctrl/Cmd + 0  →  fit the diagram to the view
+window.addEventListener('keydown', (e) => {
+  const mod = e.metaKey || e.ctrlKey;
+  if (!mod) return;
+  const key = e.key.toLowerCase();
+
+  if (key === 's') {
+    e.preventDefault();
+    downloadBtn.click();
+  } else if (key === '0') {
+    e.preventDefault();
+    PanZoom.fit();
+  }
+});
+
+// Advertise the fit shortcut on its button tooltip.
+document.getElementById('reset-view').title = `Fit to view  (${MOD}+0)`;
 
 // Keep the diagram fitted when the window resizes.
 window.addEventListener('resize', () => PanZoom.fit());

@@ -221,8 +221,13 @@ function relativeTime(ts) {
   return Math.round(s / 86400) + 'd';
 }
 
+// A readable label for a history entry. The first line is usually the diagram
+// type declaration ("flowchart TD", "graph TB", "sequenceDiagram"), which is
+// identical across most diagrams — so prefer the first line of actual content.
+const DECL_RE = /^(flowchart|graph|sequenceDiagram|classDiagram|stateDiagram(-v2)?|erDiagram|gantt|pie|gitGraph|journey|mindmap|timeline|quadrantChart|%%)/i;
 function firstLine(code) {
-  const line = code.split('\n').map((l) => l.trim()).find((l) => l) || 'Untitled';
+  const lines = code.split('\n').map((l) => l.trim()).filter((l) => l);
+  const line = lines.find((l) => !DECL_RE.test(l)) || lines[0] || 'Untitled';
   return line.length > 30 ? line.slice(0, 29) + '…' : line;
 }
 

@@ -8,15 +8,15 @@
 <meta name="description" content="Paste Mermaid diagram code and instantly download a high-resolution PNG or SVG. Free, no signup, no upload — everything runs in your browser. Supports flowchart, sequence, class, ER, gantt and more.">
 <link rel="canonical" href="https://scales-ruddy.vercel.app/">
 <meta name="theme-color" content="#CDD7DF">
-<link rel="icon" href="logo.png">
-<link rel="apple-touch-icon" href="logo.png">
+<link rel="icon" href="logo2.png">
+<link rel="apple-touch-icon" href="logo2.png">
 
 <!-- Open Graph / social preview -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://scales-ruddy.vercel.app/">
 <meta property="og:title" content="Scales — Mermaid to PNG &amp; SVG, instantly">
 <meta property="og:description" content="Paste Mermaid code, get a high-res PNG or SVG. No signup, no upload, no rate limits — it all runs in your browser.">
-<meta property="og:image" content="https://scales-ruddy.vercel.app/logo.png">
+<meta property="og:image" content="https://scales-ruddy.vercel.app/logo2.png">
 <meta property="og:image:alt" content="Scales — a Mermaid diagram editor with live preview and image export">
 <meta property="og:site_name" content="Scales">
 
@@ -25,7 +25,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Scales — Mermaid to PNG &amp; SVG, instantly">
 <meta name="twitter:description" content="Paste Mermaid code, get a high-res PNG or SVG. No signup, no upload — 100% in your browser.">
-<meta name="twitter:image" content="https://scales-ruddy.vercel.app/logo.png">
+<meta name="twitter:image" content="https://scales-ruddy.vercel.app/logo2.png">
 
 <script type="application/ld+json">
 {
@@ -78,13 +78,13 @@
     padding: 12px 22px; border-bottom: 1px solid var(--line); background: var(--surface);
   }
   .wordmark { font-family: var(--serif); font-size: 30px; line-height: 1; letter-spacing: .01em; margin: 0; font-weight: 400; }
-  /* The logo art sits in a lot of its own padding, so it is scaled up inside
-     a clipped badge to make the shell fill the mark. */
+  /* The shell fills only ~44% of its transparent canvas, so it is scaled up
+     inside a clipped badge to make the mark read at this size. */
   .logo-badge {
     width: 38px; height: 38px; flex: none; overflow: hidden; border-radius: 7px;
     background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center;
   }
-  .logo-badge img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.6); display: block; }
+  .logo-badge img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.9); display: block; }
   header .spacer { flex: 1; }
   .stamp {
     font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent);
@@ -317,7 +317,7 @@
 </head>
 <body>
   <header>
-    <div class="logo-badge"><img src="logo.png" alt="Scales logo"></div>
+    <div class="logo-badge"><img src="logo2.png" alt="Scales logo"></div>
     <h1 class="wordmark">Scales</h1>
     <div class="spacer"></div>
     <div class="stamp">Privacy first • Free forever</div>

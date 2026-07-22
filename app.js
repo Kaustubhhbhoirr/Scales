@@ -1,30 +1,66 @@
-// Themed to match the paper/ink palette — Mermaid's stock theme renders nodes
-// in lavender, which fights the warm editorial look.
-mermaid.initialize({
+// ---- Diagram themes ----
+// Each theme is a Mermaid config plus an `exportBg`: the solid colour painted
+// behind the diagram when "Transparent" is off. It must match the theme, or a
+// dark-theme diagram (light text) would vanish on a white export. `darkPreview`
+// tells the canvas to show a dark backdrop so light-ink themes stay visible.
+//
+// htmlLabels stays false in every theme: Mermaid's default foreignObject labels
+// rasterize unreliably onto canvas and clip descenders; native SVG <text> does
+// not, and still supports <br/>.
+const THEME_BASE = {
   startOnLoad: false,
   securityLevel: 'loose',
-  // Mermaid defaults to HTML labels inside <foreignObject>. Browsers rasterize
-  // foreignObject content unreliably when an SVG is drawn onto a canvas —
-  // descenders get clipped or the text vanishes entirely. Native SVG <text>
-  // exports correctly everywhere, and still supports <br/> line breaks.
   htmlLabels: false,
-  flowchart: { htmlLabels: false, useMaxWidth: false },
-  theme: 'base',
-  // Diagram ink stays dark regardless of the UI theme — the canvas represents
-  // the exported image, which is white or transparent.
-  themeVariables: {
-    background: '#FFFFFF',
-    primaryColor: '#FFFFFF',
-    primaryTextColor: '#0D273D',
-    primaryBorderColor: '#3E6985',
-    secondaryColor: '#E7ECF0',
-    tertiaryColor: '#CDD7DF',
-    lineColor: '#3E6985',
-    textColor: '#0D273D',
-    fontFamily: 'Inter, system-ui, sans-serif',
-    fontSize: '14px'
+  flowchart: { htmlLabels: false, useMaxWidth: false }
+};
+
+const THEMES = {
+  scales: {
+    label: 'Scales',
+    exportBg: '#FFFFFF',
+    darkPreview: false,
+    config: {
+      theme: 'base',
+      themeVariables: {
+        background: '#FFFFFF', primaryColor: '#FFFFFF', primaryTextColor: '#0D273D',
+        primaryBorderColor: '#3E6985', secondaryColor: '#E7ECF0', tertiaryColor: '#CDD7DF',
+        lineColor: '#3E6985', textColor: '#0D273D',
+        fontFamily: 'Inter, system-ui, sans-serif', fontSize: '14px'
+      }
+    }
+  },
+  classic: {
+    label: 'Classic',
+    exportBg: '#FFFFFF',
+    darkPreview: false,
+    config: { theme: 'default', themeVariables: { fontFamily: 'Inter, system-ui, sans-serif' } }
+  },
+  dark: {
+    label: 'Dark',
+    exportBg: '#1E1E28',
+    darkPreview: true,
+    config: { theme: 'dark', darkMode: true, themeVariables: { fontFamily: 'Inter, system-ui, sans-serif' } }
+  },
+  neutral: {
+    label: 'Neutral',
+    exportBg: '#FFFFFF',
+    darkPreview: false,
+    config: { theme: 'neutral', themeVariables: { fontFamily: 'Inter, system-ui, sans-serif' } }
   }
-});
+};
+
+const THEME_KEY = 'scales.theme';
+let currentTheme = 'scales';
+
+function initMermaid(key) {
+  const t = THEMES[key] || THEMES.scales;
+  mermaid.initialize(Object.assign({}, THEME_BASE, t.config));
+}
+
+// Solid background used for exports (and dark-preview) under the active theme.
+function activeExportBg() {
+  return (THEMES[currentTheme] || THEMES.scales).exportBg;
+}
 
 const codeInput = document.getElementById('code-input');
 const preview = document.getElementById('preview');
@@ -33,6 +69,7 @@ const errorBanner = document.getElementById('error-banner');
 const scaleSelect = document.getElementById('scale-select');
 const scaleLabel = document.getElementById('scale-label');
 const formatSelect = document.getElementById('format-select');
+const themeSelect = document.getElementById('theme-select');
 const transparentCheckbox = document.getElementById('transparent-bg');
 const downloadBtn = document.getElementById('download-btn');
 const copyBtn = document.getElementById('copy-btn');
@@ -221,7 +258,7 @@ function buildExportSvg(embedBg) {
     bg.setAttribute('y', vb.y);
     bg.setAttribute('width', vb.width);
     bg.setAttribute('height', vb.height);
-    bg.setAttribute('fill', '#ffffff');
+    bg.setAttribute('fill', activeExportBg());
     clone.insertBefore(bg, clone.firstChild);
   }
   return { clone, vb };
@@ -246,7 +283,7 @@ async function renderCanvas() {
   const canvas = document.createElement('canvas');
   canvas.width = width; canvas.height = height;
   const ctx = canvas.getContext('2d');
-  if (!transparent) { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, width, height); }
+  if (!transparent) { ctx.fillStyle = activeExportBg(); ctx.fillRect(0, 0, width, height); }
   ctx.drawImage(img, 0, 0, width, height);
   return canvas;
 }
@@ -319,6 +356,21 @@ function syncFormatUI() {
 
 formatSelect.addEventListener('change', syncFormatUI);
 
+// ---- Theme ----
+// Re-initialises Mermaid with the chosen theme, updates the canvas backdrop so
+// light-ink themes stay visible, re-renders, and remembers the choice.
+function applyTheme(key, opts) {
+  if (!THEMES[key]) key = 'scales';
+  currentTheme = key;
+  initMermaid(key);
+  preview.classList.toggle('dark', THEMES[key].darkPreview);
+  if (themeSelect) themeSelect.value = key;
+  try { localStorage.setItem(THEME_KEY, key); } catch (e) { /* not fatal */ }
+  if (!opts || opts.rerender !== false) renderDiagram(codeInput.value, true);
+}
+
+if (themeSelect) themeSelect.addEventListener('change', () => applyTheme(themeSelect.value));
+
 downloadBtn.addEventListener('click', () => {
   const run = formatSelect.value === 'svg'
     ? Promise.resolve().then(exportToSvg)
@@ -358,6 +410,12 @@ window.addEventListener('resize', () => PanZoom.fit());
 Interactions.init({ codeInput, onCodeChange: reRender });
 PanZoom.init();
 syncFormatUI();
+
+// Restore the saved theme (initialises Mermaid) without an extra render — the
+// render at the end of load handles it.
+let savedTheme = 'scales';
+try { savedTheme = localStorage.getItem(THEME_KEY) || 'scales'; } catch (e) { /* ignore */ }
+applyTheme(savedTheme, { rerender: false });
 
 // Restore the last session's work. An empty saved value is ignored so a
 // cleared editor doesn't override the starter diagram on a fresh visit.

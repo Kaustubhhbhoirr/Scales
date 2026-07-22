@@ -42,9 +42,8 @@
   "license": "https://opensource.org/licenses/MIT"
 }
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Fonts self-hosted (vendor/fonts.css) — no external requests, works offline. -->
+<link href="vendor/fonts.css" rel="stylesheet">
 <style>
   :root {
     --paper:   #CDD7DF;   /* columbia blue */
@@ -437,7 +436,8 @@
   <div id="ctx-popup"></div>
   <div id="toast" class="toast"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <!-- Mermaid self-hosted (vendor/mermaid.min.js) — no external requests, works offline. -->
+  <script src="vendor/mermaid.min.js"></script>
   <script src="panzoom.js"></script>
   <script src="interactions.js"></script>
   <script src="app.js"></script>

@@ -1,0 +1,5 @@
+# Vendored assets — never apply line-ending conversion.
+vendor/mermaid.min.js  -text
+vendor/fonts.css       -text
+*.woff2                binary
+*.png                  binary

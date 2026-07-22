@@ -78,7 +78,7 @@ cd Scales
 
 Then **open `index.html` in your browser.** Double-click it. That's the whole setup.
 
-> **Note:** Mermaid and the fonts load from CDN, so the first load needs a connection. Everything after that — rendering, editing, exporting — happens locally. Your diagram code is never transmitted anywhere.
+> **Note:** Mermaid and the fonts are bundled in the repo (`vendor/`), so the app makes **no external requests at all** — it works offline and your diagram never leaves the browser.
 
 Want it online? Drop the folder on GitHub Pages, Netlify, Vercel, or any static host. There's no backend to deploy.
 
@@ -100,8 +100,12 @@ Want it online? Drop the folder on GitHub Pages, Netlify, Vercel, or any static 
 | **Jump to code** | Click any element in any diagram type → its line is highlighted in the editor |
 | **Honest errors** | Syntax errors show inline; your last good diagram stays on screen |
 | **Auto-save** | Work is kept in `localStorage` — a refresh or crash won't lose it |
+| **Diagram history** | A "Recent" list of the last 12 diagrams — click to reopen |
+| **Themes** | Scales / Classic / Dark / Neutral, remembered across refreshes |
+| **Keyboard shortcuts** | `Ctrl/Cmd+S` to export, `Ctrl/Cmd+0` to fit |
 | **Undo** | Clearing the editor offers an Undo instead of wiping silently |
 | **Works on mobile** | Layout stacks on phones; drag to pan, pinch to zoom |
+| **Fully offline** | Mermaid and fonts are self-hosted — zero external requests |
 
 ---
 
@@ -116,15 +120,16 @@ graph TB
         D["panzoom.js<br/>zoom + pan"]
     end
 
-    subgraph "CDN — read only"
-        E["Mermaid v10"]
-        F["Google Fonts"]
+    subgraph "Bundled in the repo — no network"
+        E["vendor/mermaid.min.js"]
+        F["vendor/fonts + logo"]
     end
 
     subgraph "Output — stays on your machine"
         G["diagram.png"]
         H["diagram.svg"]
         I["clipboard"]
+        J["localStorage<br/>auto-save + history"]
     end
 
     A -->|"keystroke"| B
@@ -137,6 +142,7 @@ graph TB
     B -->|"canvas raster"| G
     B -->|"serialize"| H
     B --> I
+    B -->|"save / restore"| J
 ```
 
 **Rendering:** every keystroke calls `mermaid.render()`. Each render takes a ticket, and only the newest ticket is allowed to touch the DOM — so a slow render can never overwrite a newer one.
@@ -168,17 +174,21 @@ Fixed with `htmlLabels: false`, which makes labels native SVG `<text>`. A 12px e
 ```
 Scales/
 ├── index.html         # layout, theme, all styling
-├── app.js             # render loop, export pipeline, UI wiring
+├── app.js             # render loop, export, history, themes, shortcuts
 ├── interactions.js    # click-to-edit, shape swapping, code rewrites
 ├── panzoom.js         # zoom + pan (vector-accurate)
 ├── logo2.png
+├── vendor/            # self-hosted deps — no CDN
+│   ├── mermaid.min.js
+│   ├── fonts.css
+│   └── fonts/*.woff2
 └── docs/
     └── superpowers/
         ├── specs/     # design documents
         └── plans/     # implementation plans
 ```
 
-Four files. No `node_modules`. No config.
+Four source files, plus vendored Mermaid + fonts. No `node_modules`, no build step, no config.
 
 ---
 
@@ -196,7 +206,7 @@ Editorial rather than the usual dark developer dashboard — soft blues, deep na
 
 Type is **Instrument Serif** for the wordmark, **Inter** for UI, **JetBrains Mono** for code.
 
-Mermaid is re-themed to match, replacing its stock lavender. One deliberate exception: **diagram ink stays dark navy regardless of the interface colours**, because the canvas stands in for the exported image — which is white or transparent. Tinting diagram text to match a dark UI makes it invisible in the PNG.
+Mermaid is re-themed to match, replacing its stock lavender. The diagram itself is themeable independently of the UI (Scales / Classic / Dark / Neutral) — because the canvas stands in for the exported image, each theme carries its own **export background**, so a Dark-theme diagram's light text lands on a dark background instead of vanishing on a white PNG.
 
 ---
 
@@ -216,11 +226,11 @@ Mermaid is re-themed to match, replacing its stock lavender. One deliberate exce
 - [x] Undo on clearing the editor
 - [x] Mobile layout with touch pan and pinch zoom
 
-### V1.1 — Quality of life
+### V1.1 — Quality of life ✅
 - [x] Keyboard shortcuts (`Ctrl/Cmd+S` export, `Ctrl/Cmd+0` fit)
-- [ ] Diagram history — recent diagrams in the sidebar
-- [ ] Theme picker — switch Mermaid colour themes
-- [ ] Self-host Mermaid and fonts so the app works fully offline
+- [x] Diagram history — recent diagrams in the sidebar
+- [x] Theme picker — Scales / Classic / Dark / Neutral, remembered
+- [x] Self-hosted Mermaid and fonts — works fully offline, zero external requests
 
 ### V2 — Deeper editing
 - [ ] Drag nodes to reposition
@@ -234,8 +244,8 @@ Mermaid is re-themed to match, replacing its stock lavender. One deliberate exce
 
 - **Shape editing is flowchart-only.** Node shapes are a flowchart concept in Mermaid — sequence, class and ER diagrams have no interchangeable shapes. Those diagrams still get click-to-highlight and jump-to-code.
 - **Code rewriting is text-based.** It targets the common single-line node definition that AI tools produce. If a node can't be located unambiguously, it tells you instead of corrupting your code.
-- **Needs a connection on first load** for the Mermaid CDN and fonts. No diagram data is sent — these are plain asset downloads — but those two CDNs do see that a visitor loaded the page. Self-hosting them is on the roadmap.
-- **Auto-save is per-browser.** Work is kept in `localStorage`, so it never leaves your machine, but it also doesn't follow you to another device — and on a shared computer the last diagram is still there for the next person.
+- **Auto-save and history are per-browser.** Everything is kept in `localStorage`, so it never leaves your machine — but it also doesn't follow you to another device, and on a shared computer the recent diagrams stay for the next person. History holds the last 12 diagrams; older ones drop off.
+- **Manual Mermaid upgrades.** Mermaid is vendored rather than pulled from a CDN, so upgrading to a newer version is a manual file swap — the trade-off for working offline with zero external requests.
 
 ---
 

@@ -217,9 +217,9 @@ Mermaid is re-themed to match, replacing its stock lavender. One deliberate exce
 - [x] Mobile layout with touch pan and pinch zoom
 
 ### V1.1 — Quality of life
+- [x] Keyboard shortcuts (`Ctrl/Cmd+S` export, `Ctrl/Cmd+0` fit)
 - [ ] Diagram history — recent diagrams in the sidebar
 - [ ] Theme picker — switch Mermaid colour themes
-- [ ] Keyboard shortcuts (`Ctrl+S` export, `Ctrl+0` fit)
 - [ ] Self-host Mermaid and fonts so the app works fully offline
 
 ### V2 — Deeper editing
